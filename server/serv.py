@@ -1,14 +1,14 @@
 import socket, netifaces, ipaddress
-def handshake(input_interface, default_interface='lo', default_family='AF_INET'):
+def handshake(interface="enp7s0", family='AF_INET'):
     flag=0
     interface_list=netifaces.interfaces()#получить список интерфейсов
-    print(interface_list)
+    #print(interface_list)
     for i in interface_list:
-        if input_interface==i:
+        if interface==i:
             flag=1
-    interface=input_interface
     if flag==0:
-        interface=default_interface
+        print("You have entered the wrong interface")
+        exit()
 
     addrs = netifaces.ifaddresses(interface)
     #print(addrs)
@@ -32,4 +32,4 @@ def handshake(input_interface, default_interface='lo', default_family='AF_INET')
 
 
     
-handshake("enp7s0","lo",'AF_INET')
+handshake("enp7s0",'AF_INET')
