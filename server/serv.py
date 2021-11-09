@@ -1,35 +1,52 @@
 import socket, netifaces, ipaddress
-def handshake(interface="enp7s0", family='AF_INET'):
-    flag=0
-    interface_list=netifaces.interfaces()#получить список интерфейсов
-    #print(interface_list)
-    for i in interface_list:
-        if interface==i:
-            flag=1
-    if flag==0:
-        print("You have entered the wrong interface")
-        exit()
+from joblib import Parallel, delayed
 
-    addrs = netifaces.ifaddresses(interface)
-    #print(addrs)
+def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "51815" , debug = False):
+    '''  '''
+
+    clients = []
+
+    interface_list=netifaces.interfaces() #получить список интерфейсов
+    #print(interface_list)
+    if target_interface not in interface_list:
+        print("You have entered the wrong target_interface")
+        return "NO_INTERFACE"
+
+    addrs = netifaces.ifaddresses(target_interface)
+    if debug == True:
+        print(f"Addrs is {addrs}")
     host=addrs[netifaces.AF_INET]
-    #print(host)
+    if debug == True:
+        print(f"Host is {host}")
     ipv4=host[0]['addr']
     mask=host[0]['netmask']
-    #print(ipv4, mask)
+    if debug == True:
+        print(f"Iv4 is {ipv4}/{mask}")
     
     s=ipv4+"/"+mask
     net = ipaddress.IPv4Network(s, strict=False)
-    print("my net is", net)
-    
+    if debug == True:
+        print("my net is", net)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for addr in net:
+        if debug == True:
+            print(f"ip is {addr}")
+        result = sock.connect_ex((str(addr),int(search_port)))
+        if result == 0:
+            print(f"Found client on {addr}")
+            clients.append(addr)
+    return clients
+
+    '''
     for addr in net:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         for port in range(100,300):
             result = sock.connect_ex((str(addr),port))
             if result == 0:
                 print ("Port", port, "of", addr, "is open")
-            
+    '''       
 
 
-    
-handshake("enp7s0",'AF_INET')
+if __name__=='__main__':
+    get_client_ips("enp7s0",'AF_INET')
