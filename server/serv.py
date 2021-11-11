@@ -2,7 +2,18 @@ import socket, netifaces, ipaddress
 from joblib import Parallel, delayed
 
 def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "51815" , debug = False):
-    '''  '''
+    """ 1. What I do
+        2. What I need 
+
+    Args:
+        target_interface (str, optional): [description]. Defaults to "enp7s0".
+        family (str, optional): [description]. Defaults to 'AF_INET'.
+        search_port (str, optional): [description]. Defaults to "51815".
+        debug (bool, optional): [description]. Defaults to False.
+
+    Returns:
+        [type]: [description]
+    """
 
     clients = []
 
