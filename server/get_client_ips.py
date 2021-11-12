@@ -1,10 +1,25 @@
 import socket, netifaces, ipaddress
 import time
+from threading import *
+
+def connect(addr,search_port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(0.001)
+    result = sock.connect_ex((str(addr),int(search_port)))
+    if result == 0:
+        print(f"Found client on {addr}")
+        global clients
+        clients.append(addr)
+
+
+
+clients = []
+
 
 def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "51815" , debug = True):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
-    clients = []
+
     if debug==True:
         search_port=80
 
@@ -24,7 +39,7 @@ def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "
         print(f"Host is {host}")
     ipv4=host[0]['addr']
     mask=host[0]['netmask']
-    mask='255.255.0.0' #checked what would happen with a smaller mask
+    #mask='255.255.0.0' #checked what would happen with a smaller mask
     if debug == True:
         print(f"Iv4 is {ipv4}/{mask}")
     
@@ -34,16 +49,8 @@ def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "
         print("my net is", net)  
     
     for addr in net:
-        if debug == True:
-            #print(f"ip is {addr}")
-            pass
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(0.001)
-        result = sock.connect_ex((str(addr),int(search_port)))
-        sock.close()
-        if result == 0:
-            print(f"Found client on {addr}")
-            clients.append(addr)       
+        t=Thread(target = connect, args = (addr,search_port))
+        t.start()    
     return clients
 
 
