@@ -24,26 +24,26 @@ def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "
         print(f"Host is {host}")
     ipv4=host[0]['addr']
     mask=host[0]['netmask']
-    mask='255.255.255.0' #checked what would happen with a smaller mask
+    mask='255.255.0.0' #checked what would happen with a smaller mask
     if debug == True:
         print(f"Iv4 is {ipv4}/{mask}")
     
     s=ipv4+"/"+mask
     net = ipaddress.IPv4Network(s, strict=False)
     if debug == True:
-        print("my net is", net)
-        
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(0.1)
+        print("my net is", net)  
+    
     for addr in net:
         if debug == True:
             #print(f"ip is {addr}")
             pass
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(0.001)
         result = sock.connect_ex((str(addr),int(search_port)))
+        sock.close()
         if result == 0:
             print(f"Found client on {addr}")
-            clients.append(addr)
-    sock.settimeout(None)        
+            clients.append(addr)       
     return clients
 
 
@@ -51,4 +51,4 @@ if __name__=='__main__':
     start_time=time.time()
     clients=get_client_ips("enp7s0",'AF_INET')
     print(clients)
-    print (time.time() - start_time, "seconds")
+    print (f"program time is  {time.time() - start_time} seconds")
