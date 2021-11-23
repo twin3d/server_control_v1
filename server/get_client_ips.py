@@ -1,6 +1,10 @@
 import socket, netifaces, ipaddress
 import time
-from threading import *
+import threading 
+
+
+message = "Hi, glad to see u"
+
 
 def connect(addr,search_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,18 +25,16 @@ def connect(addr,search_port):
             print("he is a good boy!")
         sock.close()
 
-    
 
-clients = []
-message = "Hi, glad to see u"
 
-def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "51815" , debug = True):
+def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "51815" , debug = True , mask = None):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
     #if debug==True:
     #    search_port=80
-
+    global clients
+    clients = []
     interface_list=netifaces.interfaces() #получить список интерфейсов
     if debug == True:
         print(interface_list)
@@ -48,7 +50,8 @@ def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "
     if debug == True:
         print(f"Host is {host}")
     ipv4=host[0]['addr']
-    mask=host[0]['netmask']
+    if mask == None:
+        mask=host[0]['netmask']
     #mask='255.255.0.0' #checked what would happen with a smaller mask
     if debug == True:
         print(f"Iv4 is {ipv4}/{mask}")
@@ -59,9 +62,13 @@ def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "
         print("my net is", net)
         print("search_port is",search_port)  
     
+    threads = []
     for addr in net:
-        t=Thread(target = connect, args = (addr,search_port))
-        t.start()    
+        threads.append ( threading.Thread(target = connect, args = (addr,search_port)) )
+        threads[-1].start()
+        
+    for thread in threads:
+        thread.join()
     return clients
 
 
