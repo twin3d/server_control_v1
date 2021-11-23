@@ -27,7 +27,7 @@ def connect(addr,search_port):
 
 
 
-def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "51815" , debug = True , mask = None):
+def get_client_ips( target_interface="enp3s0", family='AF_INET', search_port = "51815" , debug = True , mask = None):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
@@ -35,6 +35,7 @@ def get_client_ips( target_interface="enp7s0", family='AF_INET', search_port = "
     #    search_port=80
     global clients
     clients = []
+
     interface_list=netifaces.interfaces() #получить список интерфейсов
     if debug == True:
         print(interface_list)
