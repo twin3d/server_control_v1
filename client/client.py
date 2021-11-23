@@ -1,6 +1,6 @@
 import socket, netifaces, ipaddress
 
-def client_func(target_interface="enp7s0",family='AF_INET', port = "51815",debug = True ):
+def client_func(target_interface="enp0s31f6",family='AF_INET', port = "51815",debug = True ):
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
     if debug == True:
