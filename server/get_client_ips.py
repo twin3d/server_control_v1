@@ -7,6 +7,9 @@ message = "Hi, glad to see u"
 
 
 def connect(addr,search_port):
+    '''this function tries to connect to the transmitted port.
+     If the port is open, it sends a message to the server and also receives a message. 
+     If the messages match, it prints that everything is fine'''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(0.001)
     result = sock.connect_ex((str(addr),int(search_port)))
@@ -14,9 +17,9 @@ def connect(addr,search_port):
         print(f"Found client on {addr}")
         global clients
         clients.append(addr)
-        sock.close()
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((str(addr),int(search_port)))
+        #sock.close() удалено за ненадобностью - жду подтверждения
+        #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #sock.connect((str(addr),int(search_port)))
         print("connect done")
         data = sock.recv(1024)
         print(data.decode('utf8'))
@@ -65,7 +68,7 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET', search_port = "
     
     threads = []
     for addr in net:
-        threads.append ( threading.Thread(target = connect, args = (addr,search_port)) )
+        threads.append( threading.Thread(target = connect, args = (addr,search_port)) )
         threads[-1].start()
         
     for thread in threads:

@@ -1,7 +1,9 @@
 import socket, netifaces, ipaddress
 
 def client_func(target_interface="enp3s0",family='AF_INET', port = "51815",debug = True ):
-
+    '''This function opens the port passed to it. 
+    When someone connects to this port, it sends a message and waits for a message. 
+    If the messages match, it prints that everything is fine'''
     interface_list=netifaces.interfaces() #получить список интерфейсов
     if debug == True:
         print(interface_list)
@@ -40,4 +42,4 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815",debug
 
 
 if __name__=='__main__':
-    client_func("enp3s0")
+    client_func("enp7s0")
