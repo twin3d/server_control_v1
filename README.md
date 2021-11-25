@@ -33,6 +33,8 @@ Task is to create python application launched on server control machine which sc
 Функция должна взять порт и на нем создает сокет и слушает запросы. 
 
 
+### Вид вывода
+
 
 
 
@@ -68,6 +70,36 @@ Task is to create python application launched on server control machine which sc
 
 
 
+### Вид вывода
 
+#### Работает программа
+
+Принимает: `output_type`
+Case:
+`output_type=Python (default)`
+Если внутри питона, то программа готова словарь в ответ.
+`Host = str(IP)`
+```
+Class:
+
+
+In future
+Class Host
+    scanner name
+    hostname
+    camera count
+
+Now:
+{Host1: Data1, Host2: Data2}
+
+Data1 пока пустая
+```
+
+`output_type=File`
+
+Например уже готовый конфиг для Ancible
+
+
+`output_type=Old_Config`
 
 
