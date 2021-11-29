@@ -1,6 +1,7 @@
 import socket, netifaces, ipaddress
 import logging
 import configparser
+import pickle
 
 def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", config_file = "config.ini"):
     '''This function opens the port passed to it. 
@@ -11,6 +12,7 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
     config = configparser.ConfigParser()
     config.read(config_file)   
     scaner_name = config["DEFAULT"]["Scanername"]
+    client_data = {"scaner_name": scaner_name}
 
 
 
@@ -45,6 +47,10 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
         logging.debug("got message ", data.decode("utf8"))
         if (data.decode('utf8')) == message:
             logging.debug("keys are equal")
+
+            #sending client data
+            client_data_in_bytes=pickle.dumps(client_data)
+            sock.send(client_data_in_bytes)
         
         conn.close()
 

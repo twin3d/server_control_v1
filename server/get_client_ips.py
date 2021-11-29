@@ -3,11 +3,12 @@ import time
 import threading 
 import logging
 import configparser
+import pickle
 
 message = "Hi, glad to see u"
 
 
-def connect(addr,search_port, socket_timeout):
+def connect(addr,search_port, socket_timeout, client_data):
     '''this function tries to connect to the transmitted port.
      If the port is open, it sends a message to the server and also receives a message. 
      If the messages match, it prints that everything is fine'''
@@ -24,6 +25,13 @@ def connect(addr,search_port, socket_timeout):
         if str(data.decode('utf8')) == message:
             clients.append(addr)
             logging.debug("keys are equal")
+
+            client_data_in_bytes = sock.recv(1024)
+            client_data = pickle.loads(client_data_in_bytes)
+
+
+
+
         sock.close()
 
 
