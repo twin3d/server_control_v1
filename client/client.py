@@ -1,28 +1,36 @@
 import socket, netifaces, ipaddress
+import logging
+import configparser
 
-def client_func(target_interface="enp3s0",family='AF_INET', port = "51815",debug = True ):
+def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", config_file = "config.ini"):
     '''This function opens the port passed to it. 
     When someone connects to this port, it sends a message and waits for a message. 
     If the messages match, it prints that everything is fine'''
-    interface_list=netifaces.interfaces() #получить список интерфейсов
-    if debug == True:
-        print(interface_list)
-    if target_interface not in interface_list:
-        print("You have entered the wrong target_interface")
 
+    #get values from config
+    config = configparser.ConfigParser()
+    config.read(config_file)   
+    scaner_name = config["DEFAULT"]["Scanername"]
+
+
+
+
+    interface_list=netifaces.interfaces() #получить список интерфейсов
+    
+    logging.debug(interface_list)
+    if target_interface not in interface_list:
+        logging.error("You have entered the wrong target_interface")
 
     addrs = netifaces.ifaddresses(target_interface)
-    if debug == True:
-        print(f"Addrs is {addrs}")
-        pass
+
     host=addrs[netifaces.AF_INET]
-    if debug == True:
-        print(f"Host is {host}")
+
+    logging.debug(f"Host is {host}")
+
     ipv4=host[0]['addr']
     mask=host[0]['netmask']
 
-    if debug == True:
-        print(f"my ip {ipv4}")  
+    logging.debug(f"my ip {ipv4}")  
 
     message = "Hi, glad to see u"
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,12 +39,12 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815",debug
     data=""
     while True:
         conn, addr = sock.accept()
-        print("connect done")
+        logging.debug("connected from the address", addr)
         conn.send("Hi, glad to see u".encode('utf8'))
         data = conn.recv(1024)
-        print(data.decode("utf8"))
+        logging.debug("got message ", data.decode("utf8"))
         if (data.decode('utf8')) == message:
-            print("he is a good boy!")
+            logging.debug("keys are equal")
         
         conn.close()
 
