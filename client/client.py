@@ -2,17 +2,25 @@ import socket, netifaces, ipaddress
 import logging
 import configparser
 import pickle
+import os
 
-def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", config_file = "config.ini"):
+
+
+def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", config_file = "./client/config.ini"):
     '''This function opens the port passed to it. 
     When someone connects to this port, it sends a message and waits for a message. 
     If the messages match, it prints that everything is fine'''
-
     #get values from config
     config = configparser.ConfigParser()
+    #прописать проверку существования файла
+    if not os.path.isfile(config_file):
+        logging.error("No config file")
+        return "NO_CONFIG_FILE"
     config.read(config_file)   
-    scaner_name = config["DEFAULT"]["Scanername"]
+    scaner_name = config.get("GENERAL","Scanername")
     client_data = {"scaner_name": scaner_name}
+    logging.debug(client_data) #для каждого лога указать время сообщения
+#погуглить про timestamp 
 
 
 
@@ -49,8 +57,8 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
             logging.debug("keys are equal")
 
             #sending client data
-            client_data_in_bytes=pickle.dumps(client_data)
-            sock.send(client_data_in_bytes)
+            #client_data_in_bytes=pickle.dumps(client_data)
+            #sock.send(client_data_in_bytes)
         
         conn.close()
 

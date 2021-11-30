@@ -4,6 +4,7 @@ import threading
 import logging
 import configparser
 import pickle
+import os
 
 message = "Hi, glad to see u"
 
@@ -25,9 +26,9 @@ def connect(addr,search_port, socket_timeout, client_data):
         if str(data.decode('utf8')) == message:
             clients.append(addr)
             logging.debug("keys are equal")
-
-            client_data_in_bytes = sock.recv(1024)
-            client_data = pickle.loads(client_data_in_bytes)
+            #getting client data
+            #client_data_in_bytes = sock.recv(1024)
+            #client_data = pickle.loads(client_data_in_bytes)
 
 
 
@@ -37,7 +38,7 @@ def connect(addr,search_port, socket_timeout, client_data):
 
 
 def get_client_ips( target_interface="enp3s0", family='AF_INET',
- search_port = "51815", mask = None, config_file = "confug.ini"):
+ search_port = "51815", mask = None, config_file = "./server/config.ini"):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
@@ -46,9 +47,13 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
 
     #get values from config
     config = configparser.ConfigParser()
+    if not os.path.isfile(config_file):
+        logging.error("No config file")
+        return "NO_CONFIG_FILE"    
     config.read(config_file)   
-    search_port = config["DEFAULT"]["Port"]
-    socket_timeout = config["DEFAULT"]["Timeout"]
+    search_port = config.get("GENERAL","Port")
+    socket_timeout = config["GENERAL"]["Timeout"]
+    logging.debug(search_port, socket_timeout)
 
 
 
