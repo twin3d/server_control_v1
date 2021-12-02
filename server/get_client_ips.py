@@ -9,31 +9,35 @@ import os
 message = "Hi, glad to see u"
 
 
-def connect(addr,search_port, socket_timeout, client_data):
+def connect(addr,search_port, socket_timeout):
     '''this function tries to connect to the transmitted port.
      If the port is open, it sends a message to the server and also receives a message. 
      If the messages match, it prints that everything is fine'''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(int(socket_timeout))
+    #sock.settimeout(float(socket_timeout))
+    sock.settimeout(0.01)
     result = sock.connect_ex((str(addr),int(search_port)))
     if result == 0:
         logging.debug(f"Found client on {addr}")
         global clients
         logging.debug("connect done")
         data = sock.recv(1024)
-        logging.debug("got message ", data.decode('utf8'))
+        logging.debug(f"got message  {data.decode('utf8')}")
         sock.send('Hi, glad to see u'.encode('utf8'))
         if str(data.decode('utf8')) == message:
             clients.append(addr)
             logging.debug("keys are equal")
             #getting client data
-            #client_data_in_bytes = sock.recv(1024)
-            #client_data = pickle.loads(client_data_in_bytes)
+            client_data_in_bytes = sock.recv(2048)
+            client_data = pickle.loads(client_data_in_bytes)
+            logging.debug("got client data")
+            logging.debug(str(client_data))
+            
 
 
 
 
-        sock.close()
+    sock.close()
 
 
 
@@ -44,7 +48,7 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
 
     global clients
     clients = []
-
+    
     #get values from config
     config = configparser.ConfigParser()
     if not os.path.isfile(config_file):
@@ -53,13 +57,12 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
     config.read(config_file)   
     search_port = config.get("GENERAL","Port")
     socket_timeout = config["GENERAL"]["Timeout"]
-    logging.debug(search_port, socket_timeout)
-
+    logging.debug(f"search_port is {search_port}, socket_timeout is  {socket_timeout}")
 
 
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
-    logging.debug(interface_list)
+    logging.debug(f"interface_list is {interface_list}")
 
     if target_interface not in interface_list:
         logging.error("You have entered the wrong target_interface")
@@ -79,11 +82,12 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
     s=ipv4+"/"+mask
     net = ipaddress.IPv4Network(s, strict=False)
 
-    logging.debug("my net is", net)
-    logging.debug("search_port is",search_port)  
+    logging.debug(f"my net is {net}")
+    logging.debug(f"search_port is {search_port}")  
     
     threads = []
     for addr in net:
+        #connect(addr,search_port,socket_timeout)
         threads.append( threading.Thread(target = connect, args = (addr,search_port,socket_timeout)))
         threads[-1].start()
         
@@ -91,6 +95,8 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
         thread.join()
 
     return clients
+
+
 
 def output_print(clients, output_type = "python"):
     if output_type == "python":

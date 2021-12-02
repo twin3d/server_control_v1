@@ -19,15 +19,12 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
     config.read(config_file)   
     scaner_name = config.get("GENERAL","Scanername")
     client_data = {"scaner_name": scaner_name}
-    logging.debug(client_data) #для каждого лога указать время сообщения
+    logging.debug(f"client_data is {client_data}") #для каждого лога указать время сообщения
 #погуглить про timestamp 
-
-
-
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
     
-    logging.debug(interface_list)
+    logging.debug(f"interface_list is {interface_list}")
     if target_interface not in interface_list:
         logging.error("You have entered the wrong target_interface")
 
@@ -49,16 +46,15 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
     data=""
     while True:
         conn, addr = sock.accept()
-        logging.debug("connected from the address", addr)
+        logging.debug(f"connected from the address {addr}")
         conn.send("Hi, glad to see u".encode('utf8'))
         data = conn.recv(1024)
-        logging.debug("got message ", data.decode("utf8"))
+        logging.debug(data.decode("utf8"))
         if (data.decode('utf8')) == message:
             logging.debug("keys are equal")
-
             #sending client data
-            #client_data_in_bytes=pickle.dumps(client_data)
-            #sock.send(client_data_in_bytes)
+            client_data_in_bytes=pickle.dumps(client_data)
+            conn.send(client_data_in_bytes)
         
         conn.close()
 
