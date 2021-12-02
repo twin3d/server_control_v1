@@ -19,7 +19,8 @@ def connect(addr,search_port, socket_timeout):
     result = sock.connect_ex((str(addr),int(search_port)))
     if result == 0:
         logging.debug(f"Found client on {addr}")
-        global clients
+        #global clients
+        #global clients_dict
         logging.debug("connect done")
         data = sock.recv(1024)
         logging.debug(f"got message  {data.decode('utf8')}")
@@ -32,22 +33,22 @@ def connect(addr,search_port, socket_timeout):
             client_data = pickle.loads(client_data_in_bytes)
             logging.debug("got client data")
             logging.debug(str(client_data))
+            clients_dict[str(addr)] = client_data
             
-
-
-
-
     sock.close()
 
 
 
 def get_client_ips( target_interface="enp3s0", family='AF_INET',
- search_port = "51815", mask = None, config_file = "./server/config.ini"):
+ search_port = "51815", mask = None, config_file = "./server/config.ini", output_type = "output_file"):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
     global clients
     clients = []
+    global clients_dict
+    clients_dict = {}
+
     
     #get values from config
     config = configparser.ConfigParser()
@@ -90,15 +91,17 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
         #connect(addr,search_port,socket_timeout)
         threads.append( threading.Thread(target = connect, args = (addr,search_port,socket_timeout)))
         threads[-1].start()
-        
+
+
     for thread in threads:
         thread.join()
 
-    return clients
+    #return clients
+    output_print(output_type)
 
 
-
-def output_print(clients, output_type = "python"):
+def output_print(output_type = "python"):
+    logging.debug(f"output_type is {output_type}")
     if output_type == "python":
         output_dict = {}
         for client in clients:
@@ -108,13 +111,40 @@ def output_print(clients, output_type = "python"):
         return output_dict
 
     elif output_type == "output_file":
-        pass
+        return print_to_file()
     else:
         logging.error("You enter wrong output_type")
         return "ERROR_OUTPUT"
 
 
 
+def print_to_file():
+    file = open("output_file.txt", "w")
+    logging.debug("writing to file")
+    #write big section
+    file.write("Big\n")
+    for ip in clients_dict.keys():
+        if clients_dict[ip]["scaner_type"]=="Big":
+            file.write(clients_dict[ip]["scaner_name"])
+            file.write(" ")
+            file.write(str(ip))
+            file.write(" ")
+            file.write(clients_dict[ip]["mac_addr"])
+            file.write("\n")
+
+    file.write("\n")
+    #write small section
+    file.write("Small\n")
+    for ip in clients_dict.keys():
+        if clients_dict[ip]["scaner_type"]=="Small":
+            file.write(clients_dict[ip]["scaner_name"])
+            file.write(" ")
+            file.write(str(ip))
+            file.write(" ")
+            file.write(clients_dict[ip]["mac_addr"])
+            file.write("\n")
+
+    file.close()
 
 
 
@@ -123,7 +153,7 @@ def output_print(clients, output_type = "python"):
 
 if __name__=='__main__':
     start_time=time.time()
-    clients=get_client_ips("enp7s0",'AF_INET')
+    get_client_ips("enp7s0",'AF_INET')
     logging.info(clients)
     logging.debug(f"program time is  {time.time() - start_time} seconds")
 

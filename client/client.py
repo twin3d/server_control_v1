@@ -18,9 +18,13 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
         return "NO_CONFIG_FILE"
     config.read(config_file)   
     scaner_name = config.get("GENERAL","Scanername")
-    client_data = {"scaner_name": scaner_name}
-    logging.debug(f"client_data is {client_data}") #для каждого лога указать время сообщения
-#погуглить про timestamp 
+    scaner_type = config.get("GENERAL","Type")
+    mac_addr = netifaces.ifaddresses(target_interface)[netifaces.AF_LINK][0]["addr"]
+    client_data = {"scaner_name": scaner_name, "scaner_type": scaner_type, "mac_addr": mac_addr}
+    logging.debug(f"client_data is {client_data}")
+
+     #для каждого лога указать время сообщения
+    #погуглить про timestamp 
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
     
@@ -38,6 +42,9 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
     mask=host[0]['netmask']
 
     logging.debug(f"my ip {ipv4}")  
+
+    
+
 
     message = "Hi, glad to see u"
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,6 +64,7 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
             conn.send(client_data_in_bytes)
         
         conn.close()
+        #break
 
 
 if __name__=='__main__':
