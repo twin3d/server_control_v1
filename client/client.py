@@ -3,10 +3,10 @@ import logging
 import configparser
 import pickle
 import os
+import argparse
 
 
-
-def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", config_file = "./client/config.ini"):
+def client_func(config_file = "./client/config.ini"):
     '''This function opens the port passed to it. 
     When someone connects to this port, it sends a message and waits for a message. 
     If the messages match, it prints that everything is fine'''
@@ -19,18 +19,25 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
     config.read(config_file)   
     scaner_name = config.get("GENERAL","Scanername")
     scaner_type = config.get("GENERAL","Type")
-    mac_addr = netifaces.ifaddresses(target_interface)[netifaces.AF_LINK][0]["addr"]
-    client_data = {"scaner_name": scaner_name, "scaner_type": scaner_type, "mac_addr": mac_addr}
-    logging.debug(f"client_data is {client_data}")
-
-     #для каждого лога указать время сообщения
-    #погуглить про timestamp 
+    target_interface = config.get("GENERAL","Target_interface")
+    port = config.get("GENERAL","Port")
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
     
     logging.debug(f"interface_list is {interface_list}")
     if target_interface not in interface_list:
         logging.error("You have entered the wrong target_interface")
+
+
+    mac_addr = netifaces.ifaddresses(target_interface)[netifaces.AF_LINK][0]["addr"]
+    client_data = {"scaner_name": scaner_name, "scaner_type": scaner_type, "mac_addr": mac_addr}
+    logging.debug(f"client_data is {client_data}")
+
+
+    
+
+
+    
 
     addrs = netifaces.ifaddresses(target_interface)
 
@@ -68,4 +75,16 @@ def client_func(target_interface="enp3s0",family='AF_INET', port = "51815", conf
 
 
 if __name__=='__main__':
-    client_func("enp7s0")
+    
+    parser = argparse.ArgumentParser(description='Config')
+
+    parser.add_argument(
+        '--config',
+        type=str,
+        default="config.ini",
+        help='enter config (default: config.ini)'
+    )
+    args = parser.parse_args()
+
+    logging.debug(args.config)
+    client_func(args.config)
