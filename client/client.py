@@ -4,23 +4,45 @@ import configparser
 import pickle
 import os
 import argparse
+import sys
 
-
-def client_func(config_file = "./client/config.ini"):
+def client_func(config_file = "config.ini"):
     '''This function opens the port passed to it. 
     When someone connects to this port, it sends a message and waits for a message. 
     If the messages match, it prints that everything is fine'''
+    
     #get values from config
-    config = configparser.ConfigParser()
-    #прописать проверку существования файла
-    if not os.path.isfile(config_file):
-        logging.error("No config file")
-        return "NO_CONFIG_FILE"
-    config.read(config_file)   
-    scaner_name = config.get("GENERAL","Scanername")
-    scaner_type = config.get("GENERAL","Type")
-    target_interface = config.get("GENERAL","Target_interface")
-    port = config.get("GENERAL","Port")
+    try:
+        config = configparser.ConfigParser()
+        #прописать проверку существования файла
+        if not os.path.isfile(config_file):
+            logging.error("No config file")
+            return "NO_CONFIG_FILE"
+        config.read(config_file)   
+        scaner_name = config.get("GENERAL","Scanername")
+        scaner_type = config.get("GENERAL","Type")
+        target_interface = config.get("GENERAL","Target_interface")
+        port = config.get("GENERAL","Port")
+
+        try:
+            log_level = config.get("GENERAL","log_level")
+        except Exception:
+            log_level = "debug"
+        
+        logger = logging.getLogger()
+        if log_level == "debug":
+            logger.setLevel(logging.DEBUG)
+        elif log_level == "warning":
+            logger.setLevel(logging.ERROR)
+        logger.debug(f"Debug level is {log_level}")
+
+    except Exception as err_msg:
+        logging.error(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
+        print(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
+        sys.exit()
+
+
+
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
     

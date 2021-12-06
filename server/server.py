@@ -5,6 +5,7 @@ import logging
 import configparser
 import pickle
 import os
+import sys
 
 message = "Hi, glad to see u"
 
@@ -39,11 +40,11 @@ def connect(addr,search_port, socket_timeout):
 
 
 
-def get_client_ips( target_interface="enp3s0", family='AF_INET',
- search_port = "51815", mask = None, config_file = "./server/config.ini", output_file = None):
+def get_client_ips( target_interface=None, search_port = "51815", mask = None, 
+config_file = "config.ini", output_file = None):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
-    import sys,logging
+
     global clients
     clients = []
     global clients_dict
@@ -52,14 +53,20 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
     
     #get values from config
     try:
-        config = configparser.ConfigParser()  
+        config = configparser.ConfigParser()
+        if not os.path.isfile(config_file):
+            logging.error("No config file")
+            return "NO_CONFIG_FILE"  
         config.read(config_file)   
         search_port = config.get("GENERAL","Port")
+        socket_timeout = config["GENERAL"]["Timeout"]
+        if target_interface == None:
+            target_interface = config["GENERAL"]["Interface"]
         try:
             log_level = config.get("GENERAL","log_level")
         except Exception:
             log_level = "debug"
-        socket_timeout = config["GENERAL"]["Timeout"]
+        
         
         logger = logging.getLogger()
         if log_level == "debug":
@@ -108,38 +115,29 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
     for thread in threads:
         thread.join()
 
-    #return clients
-    if output_file != None:
-        print_to_file(output_file)
-        
     # ВСЕГДА RETURN!!!
-    #return output()
+    return output(output_file)
 
 
-def output():
-    '''Выводит вывод в файл, если он передан.'''
-    #logging.debug(f"output_type is {filename}")
+def output(filename):
+    '''output function'''
     if filename == None:
-        output_dict = {}
-        for client in clients:
-            host = str(client)
-            output_dict[host]=""
+        logging.debug('Python output')
+        return clients_dict
 
-        return output_dict
+    else:
+        return print_to_file(filename)
 
-    elif filename == "output_file":
-        return print_to_file()
-    #else:
-    #    logging.error("You entered wrong output_type")
-    #    return "ERROR_OUTPUT"
 
 
 
 def print_to_file(filename):
+    '''function of output of the program result to a file'''
     try:
         file = open(filename, "w")
     except Exception as err_msg:
         logging.error("You entered wrong filename. Error is {err_msg}")
+        sys.exit()
     logging.debug("writing to file")
     #write big section
     file.write("Big\n")
@@ -153,6 +151,7 @@ def print_to_file(filename):
             file.write("\n")
 
     file.write("\n")
+
     #write small section
     file.write("Small\n")
     for ip in clients_dict.keys():
@@ -174,6 +173,6 @@ def print_to_file(filename):
 if __name__=='__main__':
     start_time=time.time()
     get_client_ips("enp7s0",'AF_INET')
-    logging.info(clients)
+    logging.info(clients_dict)
     logging.debug(f"program time is  {time.time() - start_time} seconds")
 
