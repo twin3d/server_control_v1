@@ -111,12 +111,14 @@ def get_client_ips( target_interface="enp3s0", family='AF_INET',
     #return clients
     if output_file != None:
         print_to_file(output_file)
+        
     # ВСЕГДА RETURN!!!
+    #return output()
 
 
-def output(filename):
+def output():
     '''Выводит вывод в файл, если он передан.'''
-    logging.debug(f"output_type is {filename}")
+    #logging.debug(f"output_type is {filename}")
     if filename == None:
         output_dict = {}
         for client in clients:
