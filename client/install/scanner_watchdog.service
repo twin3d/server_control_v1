@@ -1,15 +1,18 @@
 [Unit]
 Description=Scanner clien
-#After=network.target
+After=network.target
+
 
 [Service]
 Type=simple
 # Another Type: forking
-#User=miksolo
-WorkingDirectory=/home/miksolo/work/server_control_v1/client
-ExecStart=python3 /home/miksolo/work/server_control_v1/client/client.py --config /home/miksolo/work/server_control_v1/client/configuration/configuration.ini
+#User=%USER
+WorkingDirectory=%CLIENT_PATH
+ExecStart=python3 %CLIENT_PATH/client.py --config %CLIENT_PATH/configuration/configuration.ini
 Restart=on-failure
 # Other restart options: always, on-abort, etc
+#StandardInput=tty-force
+
 
 # The install section is needed to use
 # `systemctl enable` to start on boot

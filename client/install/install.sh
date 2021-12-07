@@ -4,7 +4,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # Installing python packages
 
-if [ $(pip3 --version) -ne 0 ]; then
+if [ "$(pip3 --version)" -ne 0 ]; then
     sudo apt install python3-pip
 fi
 
@@ -14,6 +14,8 @@ client_target_dir=$(realpath $DIR/..)
 
 #Create config
 
+cp "$client_target_dir/config.ini" "./configuration/configuration.ini"
+
 # Create unit file
 USER_SYSTEMD_DIR=/home/$USER/.config/systemd/user
 mkdir -p $USER_SYSTEMD_DIR
@@ -21,6 +23,7 @@ mkdir -p $USER_SYSTEMD_DIR
 cp "scanner_watchdog.service" "scanner_watchdog.service_temp"
 
 sed -i "s#%CLIENT_PATH#$client_target_dir#g" "scanner_watchdog.service_temp"
+sed -i "s#%USER#$USER#g" "scanner_watchdog.service_temp"
 
 cp "scanner_watchdog.service_temp" "$USER_SYSTEMD_DIR/scanner_watchdog.service"
 
