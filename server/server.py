@@ -174,7 +174,7 @@ def print_to_file(filename):
 
 if __name__=='__main__':
     start_time=time.time()
-    get_client_ips("enp7s0",'AF_INET')
+    get_client_ips()
     logging.info(clients_dict)
-    logging.debug(f"program time is  {time.time() - start_time} seconds")
+    #logging.debug(f"program time is  {time.time() - start_time} seconds")
 
