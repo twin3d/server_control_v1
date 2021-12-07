@@ -13,7 +13,7 @@ pip3 install -r $DIR/requirements.txt
 client_target_dir=$(realpath $DIR/..)
 
 #Create config
-mkdir -p "$client_target_dir/configuration/configuration.ini"
+mkdir -p "$client_target_dir/configuration"
 cp "$client_target_dir/config.ini" "$client_target_dir/configuration/configuration.ini"
 
 # Create unit file
