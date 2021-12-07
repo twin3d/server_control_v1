@@ -7,7 +7,7 @@ Type=simple
 # Another Type: forking
 #User=miksolo
 WorkingDirectory=%CLIENT_PATH
-ExecStart=python3 --config %CLIENT_PATH/configuration/configuration.ini %CLIENT_PATH/client.py
+ExecStart=python3 %CLIENT_PATH/client.py --config %CLIENT_PATH/configuration/configuration.ini
 Restart=on-failure
 # Other restart options: always, on-abort, etc
 
