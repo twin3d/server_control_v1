@@ -24,3 +24,4 @@ sed -i "s#%CLIENT_PATH#$client_target_dir#g" "scanner_watchdog.service_temp"
 
 cp "scanner_watchdog.service_temp" "$USER_SYSTEMD_DIR/scanner_watchdog.service"
 
+rm "scanner_watchdog.service_temp"

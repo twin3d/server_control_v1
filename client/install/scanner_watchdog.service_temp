@@ -7,7 +7,7 @@ Type=simple
 # Another Type: forking
 #User=miksolo
 WorkingDirectory=/home/miksolo/work/server_control_v1/client
-ExecStart=python3 --config /home/miksolo/work/server_control_v1/client/configuration/configuration.ini /home/miksolo/work/server_control_v1/client/client.py
+ExecStart=python3 /home/miksolo/work/server_control_v1/client/client.py --config /home/miksolo/work/server_control_v1/client/configuration/configuration.ini
 Restart=on-failure
 # Other restart options: always, on-abort, etc
 
