@@ -13,8 +13,8 @@ pip3 install -r $DIR/requirements.txt
 client_target_dir=$(realpath $DIR/..)
 
 #Create config
-
-cp "$client_target_dir/config.ini" "./configuration/configuration.ini"
+mkdir -p "$client_target_dir/configuration/configuration.ini"
+cp "$client_target_dir/config.ini" "$client_target_dir/configuration/configuration.ini"
 
 # Create unit file
 USER_SYSTEMD_DIR=/home/$USER/.config/systemd/user
