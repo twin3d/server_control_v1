@@ -31,3 +31,4 @@ rm "scanner_watchdog.service_temp"
 
 systemctl --user daemon-reload && systemctl --user restart scanner_watchdog.service
 systemctl --user restart scanner_watchdog.service
+systemctl --user enable scanner_watchdog.service
