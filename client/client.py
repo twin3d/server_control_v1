@@ -9,7 +9,8 @@ import sys
 def client_func(config_file = "config.ini"):
     '''This function opens the port passed to it. 
     When someone connects to this port, it sends a message and waits for a message. 
-    If the messages match, it prints that everything is fine'''
+    If the messages match, it prints that everything is fine
+    after that, it sends the client data to the server'''
     
     #get values from config
     try:
@@ -54,11 +55,6 @@ def client_func(config_file = "config.ini"):
     mac_addr = netifaces.ifaddresses(target_interface)[netifaces.AF_LINK][0]["addr"]
     client_data = {"scaner_name": scaner_name, "scaner_type": scaner_type, "mac_addr": mac_addr}
     logging.debug(f"client_data is {client_data}")
-
-
-    
-
-
     
 
     addrs = netifaces.ifaddresses(target_interface)
@@ -73,8 +69,6 @@ def client_func(config_file = "config.ini"):
     logging.debug(f"my ip {ipv4}")  
 
     
-
-
     message = "Hi, glad to see u"
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((ipv4, int(port)))

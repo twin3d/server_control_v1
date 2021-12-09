@@ -13,7 +13,8 @@ message = "Hi, glad to see u"
 def connect(addr,search_port, socket_timeout):
     '''this function tries to connect to the transmitted port.
      If the port is open, it sends a message to the server and also receives a message. 
-     If the messages match, it prints that everything is fine'''
+     If the messages match, it prints that everything is fine
+     after that, it receives the client's data'''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #sock.settimeout(float(socket_timeout))
     sock.settimeout(0.01)
@@ -137,7 +138,8 @@ def print_to_file(filename):
         file = open(filename, "w")
     except Exception as err_msg:
         logging.error("You entered wrong filename. Error is {err_msg}")
-        sys.exit()
+        #sys.exit()
+        #вопрос что делать если не смог записать в файл - записать в дефолтный
     logging.debug("writing to file")
     #write big section
     file.write("Big\n")
@@ -172,7 +174,7 @@ def print_to_file(filename):
 
 if __name__=='__main__':
     start_time=time.time()
-    get_client_ips("enp7s0",'AF_INET')
+    get_client_ips()
     logging.info(clients_dict)
-    logging.debug(f"program time is  {time.time() - start_time} seconds")
+    #logging.debug(f"program time is  {time.time() - start_time} seconds")
 
