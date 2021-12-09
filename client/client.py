@@ -110,3 +110,19 @@ if __name__=='__main__':
 
     logging.debug(args.config)
     client_func(args.config)
+
+
+
+def guess_interface(): 
+
+    interface_list=netifaces.interfaces()
+    for interface in interface_list:
+        if interface[0]=="e":
+            #print(interface)
+            addrs = netifaces.ifaddresses(interface)
+            host=addrs[netifaces.AF_INET]
+            ipv4=host[0]['addr']
+            #print(ipv4)
+            if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
+                return interface
+    return "No interface"

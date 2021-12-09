@@ -61,7 +61,7 @@ config_file = "config.ini", output_file = None):
         search_port = config.get("GENERAL","Port")
         socket_timeout = config["GENERAL"]["Timeout"]
         if target_interface == None:
-            target_interface = config["GENERAL"]["Interface"]
+            target_interface = config["GENERAL"]["Target_interface"]
         try:
             log_level = config.get("GENERAL","log_level")
         except Exception:
