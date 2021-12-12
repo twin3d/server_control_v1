@@ -6,7 +6,22 @@ import os
 import argparse
 import sys
 
-def client_func(config_file = "config.ini"):
+
+def guess_interface(): 
+
+    interface_list=netifaces.interfaces()
+    for interface in interface_list:
+        if interface[0]=="e":
+            #print(interface)
+            addrs = netifaces.ifaddresses(interface)
+            host=addrs[netifaces.AF_INET]
+            ipv4=host[0]['addr']
+            #print(ipv4)
+            if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
+                return interface
+    return "No interface"
+
+def client_func(config_file, target_interface = None):
     '''This function opens the port passed to it. 
     When someone connects to this port, it sends a message and waits for a message. 
     If the messages match, it prints that everything is fine
@@ -22,7 +37,8 @@ def client_func(config_file = "config.ini"):
         config.read(config_file)   
         scaner_name = config.get("GENERAL","Scanername")
         scaner_type = config.get("GENERAL","Type")
-        target_interface = config.get("GENERAL","Target_interface")
+        if target_interface == None:
+            target_interface = guess_interface()
         port = config.get("GENERAL","Port")
 
         try:
@@ -50,6 +66,7 @@ def client_func(config_file = "config.ini"):
     logging.debug(f"interface_list is {interface_list}")
     if target_interface not in interface_list:
         logging.error("You have entered the wrong target_interface")
+        sys.exit()
 
 
     mac_addr = netifaces.ifaddresses(target_interface)[netifaces.AF_LINK][0]["addr"]
@@ -90,33 +107,29 @@ def client_func(config_file = "config.ini"):
         #break
 
 
+
+
 if __name__=='__main__':
     
     parser = argparse.ArgumentParser(description='Config')
-
+    a = guess_interface()
     parser.add_argument(
         '--config',
         type=str,
         default="config.ini",
         help='enter config (default: config.ini)'
     )
+    '''
+    parser.add_argument(
+        '--i',
+        type=str,
+        help='enter target interface'
+    )'''
     args = parser.parse_args()
 
-    logging.debug(args.config)
-    client_func(args.config)
+    #print(args.config, args.i)
+    client_func(config_file = args.config)
 
 
 
-def guess_interface(): 
 
-    interface_list=netifaces.interfaces()
-    for interface in interface_list:
-        if interface[0]=="e":
-            #print(interface)
-            addrs = netifaces.ifaddresses(interface)
-            host=addrs[netifaces.AF_INET]
-            ipv4=host[0]['addr']
-            #print(ipv4)
-            if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
-                return interface
-    return "No interface"

@@ -6,9 +6,23 @@ import configparser
 import pickle
 import os
 import sys
+import argparse
 
 message = "Hi, glad to see u"
 
+def guess_interface(): 
+
+    interface_list=netifaces.interfaces()
+    for interface in interface_list:
+        if interface[0]=="e":
+            #print(interface)
+            addrs = netifaces.ifaddresses(interface)
+            host=addrs[netifaces.AF_INET]
+            ipv4=host[0]['addr']
+            #print(ipv4)
+            if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
+                return interface
+    return "No interface"
 
 def connect(addr,search_port, socket_timeout):
     '''this function tries to connect to the transmitted port.
@@ -62,7 +76,7 @@ config_file = "config.ini", output_file = None):
         search_port = config.get("GENERAL","Port")
         socket_timeout = config["GENERAL"]["Timeout"]
         if target_interface == None:
-            target_interface = config["GENERAL"]["Target_interface"]
+            target_interface = guess_interface()
         try:
             log_level = config.get("GENERAL","log_level")
         except Exception:
@@ -174,7 +188,33 @@ def print_to_file(filename):
 
 if __name__=='__main__':
     start_time=time.time()
-    get_client_ips()
+    
+    parser = argparse.ArgumentParser(description='Config')
+
+    parser.add_argument(
+        '--config', '--c',
+        type=str,
+        default="config.ini",
+        help='enter config (default: config.ini)'
+    )
+    '''#закомментировано, тк интерфейс угадывается автоматически
+    parser.add_argument(
+        '--i',
+        type=str,
+        help='enter target interface'
+    )
+    args = parser.parse_args()
+    '''
+    parser.add_argument(
+        '--out', '--o',
+        type=str,
+        help='enter output file (default: output_file.txt)'
+    )
+
+    args = parser.parse_args()
+    print(args)
+
+    get_client_ips(config_file = args.config, output_file = args.out)
     logging.info(clients_dict)
     #logging.debug(f"program time is  {time.time() - start_time} seconds")
 
