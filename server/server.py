@@ -56,7 +56,7 @@ def connect(addr,search_port, socket_timeout):
 
 
 def get_client_ips( target_interface=None, search_port = "51815", mask = None, 
-config_file = "config.ini", output_file = None):
+config_file = "config.ini", output_file = None, output_type = None, conf = None):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
@@ -131,17 +131,23 @@ config_file = "config.ini", output_file = None):
         thread.join()
 
     # ВСЕГДА RETURN!!!
-    return output(output_file)
+    return output(output_file, output_type, conf)
 
 
-def output(filename):
+def output(output_file, output_type, conf):
     '''output function'''
-    if filename == None:
+    if output_type == "python":
         logging.debug('Python output')
         return clients_dict
 
+    elif output_type == "text":
+        print_to_file(output_file)
+
+    elif output_type == "config":
+        correct_file(conf, output_file)
+
     else:
-        return print_to_file(filename)
+        print("problems with output type")
 
 
 
@@ -183,6 +189,39 @@ def print_to_file(filename):
 
 
 
+def correct_file(input_filename, output_filename):
+    input_file = open(input_filename, "r")
+    output_file = open(output_filename,"w")
+
+    big_cliets_list=[]
+    small_cliets_list=[]
+
+    for addr in clients_dict.keys():
+        if clients_dict[addr]["scaner_type"]=="Big":
+            big_cliets_list.append(addr)
+        elif clients_dict[addr]["scaner_type"]=="Small":
+            small_cliets_list.append(addr)
+
+
+    while True:
+        line = input_file.readline()
+        if not line:
+            break
+        output_file.write(line)
+        if "BIG" in line:
+            for ip in big_cliets_list:
+                output_file.write(f'  ips+=("{ip}")\n')
+                output_file.write('  users+=("pi")')
+
+        if "SMALL" in line:
+            for ip in small_cliets_list:
+                output_file.write(f'  ips+=("{ip}")\n')
+                output_file.write('  users+=("pi")')
+
+
+
+
+
 
 
 
@@ -197,7 +236,6 @@ if __name__=='__main__':
         default="config.ini",
         help='enter config (default: config.ini)'
     )
-    #закомментировано, тк интерфейс угадывается автоматически
     parser.add_argument(
         '--i',
         type=str,
@@ -206,13 +244,33 @@ if __name__=='__main__':
     parser.add_argument(
         '--out', '--o',
         type=str,
+        default="output_file",
         help='enter output file (default: output_file.txt)'
     )
 
-    args = parser.parse_args()
-    print(args)
+    parser.add_argument(
+        '--type', '--t',
+        type=str,
+        default="text",
+        help="enter the output type, it may be: python program will return a dictionary;\n text - the program will output as a text file\n; config - the program will add ip addresses to the transmitted config file  (default: text)"
+    )
 
-    get_client_ips(config_file = args.config, output_file = args.out)
+
+    parser.add_argument(
+        '--config_sh', '--s',
+        type=str,
+        default="conf.sh",
+        help="enter the config file to which you want to add ip addresses (default: conf.sh)"
+    )
+
+    args = parser.parse_args()
+    output_types=["python", "text", "config"]
+    if args.type not in output_types:
+        print("entered incorrect output type")
+        sys.exit()
+
+    get_client_ips(config_file = args.config, output_file = args.out,
+    output_type =args.type, conf = args.config_sh)
     logging.info(clients_dict)
     #logging.debug(f"program time is  {time.time() - start_time} seconds")
 
