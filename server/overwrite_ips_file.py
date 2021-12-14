@@ -51,7 +51,7 @@ def correct_ips(input_file, output_file, clients_list):
             break
         if "ips" in line and "#ips" not in line and "192.160" in line:
             position = line.find("192.160")
-            if client_number > len(client_list):
+            if client_number > len(clients_list):
                 print("there are more addresses written in one of the config sections than the program found")
                 return "there are more addresses written in one of the config sections than the program found"
             while line[position] != line[position-1]: #удаляем старый ip

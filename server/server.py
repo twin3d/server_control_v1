@@ -183,6 +183,39 @@ def print_to_file(filename):
 
 
 
+def correct_file(input_filename, output_filename, clients_dict):
+    input_file = open(input_filename, "r")
+    output_file = open(output_filename,"w")
+
+    big_cliets_list=[]
+    small_cliets_list=[]
+
+    for addr in clients_dict.keys():
+        if clients_dict[addr]["scaner_type"]=="Big":
+            big_cliets_list.append(addr)
+        elif clients_dict[addr]["scaner_type"]=="Small":
+            small_cliets_list.append(addr)
+
+
+    while True:
+        line = input_file.readline()
+        if not line:
+            break
+        output_file.write(line)
+        if "BIG" in line:
+            for ip in big_cliets_list:
+                output_file.write(f'  ips+=("{ip}")\n')
+                output_file.write('  users+=("pi")')
+
+        if "SMALL" in line:
+            for ip in small_cliets_list:
+                output_file.write(f'  ips+=("{ip}")\n')
+                output_file.write('  users+=("pi")')
+
+
+
+
+
 
 
 
@@ -197,7 +230,6 @@ if __name__=='__main__':
         default="config.ini",
         help='enter config (default: config.ini)'
     )
-    #закомментировано, тк интерфейс угадывается автоматически
     parser.add_argument(
         '--i',
         type=str,
@@ -207,6 +239,13 @@ if __name__=='__main__':
         '--out', '--o',
         type=str,
         help='enter output file (default: output_file.txt)'
+    )
+
+    parser.add_argument(
+        '--type', '--t',
+        type=str,
+        default="text",
+        help="enter the output type, it may be: python program will return a dictionary;\n text - the program will output as a text file\n; config - the program will add ip addresses to the transmitted config file"
     )
 
     args = parser.parse_args()
