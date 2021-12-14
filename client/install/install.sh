@@ -10,6 +10,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 # Installing python packages
 
 if [ "$(pip3 --version)" -ne 0 ]; then
+    sudo apt update
     sudo apt install python3-pip
 fi
 
