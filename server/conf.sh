@@ -25,8 +25,6 @@ fi
 
 if [[ $SCANNER == "SMALL" ]]; then
   
-
-  
   SCANNER_MQTT_IP="192.160.21.19"
   PLUG_IP="192.160.21.140"
   PLUG_TOKEN="56a298c71d5d4ac8a13f6244971dd031"

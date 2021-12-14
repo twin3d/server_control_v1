@@ -56,7 +56,7 @@ def connect(addr,search_port, socket_timeout):
 
 
 def get_client_ips( target_interface=None, search_port = "51815", mask = None, 
-config_file = "config.ini", output_file = None):
+config_file = "config.ini", output_file = None, output_type = None, conf = None):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
@@ -131,17 +131,23 @@ config_file = "config.ini", output_file = None):
         thread.join()
 
     # ВСЕГДА RETURN!!!
-    return output(output_file)
+    return output(output_file, output_type, conf)
 
 
-def output(filename):
+def output(output_file, output_type, conf):
     '''output function'''
-    if filename == None:
+    if output_type == "python":
         logging.debug('Python output')
         return clients_dict
 
+    elif output_type == "text":
+        print_to_file(output_file)
+
+    elif output_type == "config":
+        correct_file(conf, output_file)
+
     else:
-        return print_to_file(filename)
+        print("problems with output type")
 
 
 
@@ -183,7 +189,7 @@ def print_to_file(filename):
 
 
 
-def correct_file(input_filename, output_filename, clients_dict):
+def correct_file(input_filename, output_filename):
     input_file = open(input_filename, "r")
     output_file = open(output_filename,"w")
 
@@ -238,6 +244,7 @@ if __name__=='__main__':
     parser.add_argument(
         '--out', '--o',
         type=str,
+        default="output_file",
         help='enter output file (default: output_file.txt)'
     )
 
@@ -245,13 +252,25 @@ if __name__=='__main__':
         '--type', '--t',
         type=str,
         default="text",
-        help="enter the output type, it may be: python program will return a dictionary;\n text - the program will output as a text file\n; config - the program will add ip addresses to the transmitted config file"
+        help="enter the output type, it may be: python program will return a dictionary;\n text - the program will output as a text file\n; config - the program will add ip addresses to the transmitted config file  (default: text)"
+    )
+
+
+    parser.add_argument(
+        '--config_sh', '--s',
+        type=str,
+        default="conf.sh",
+        help="enter the config file to which you want to add ip addresses (default: conf.sh)"
     )
 
     args = parser.parse_args()
-    print(args)
+    output_types=["python", "text", "config"]
+    if args.type not in output_types:
+        print("entered incorrect output type")
+        sys.exit()
 
-    get_client_ips(config_file = args.config, output_file = args.out)
+    get_client_ips(config_file = args.config, output_file = args.out,
+    output_type =args.type, conf = args.config_sh)
     logging.info(clients_dict)
     #logging.debug(f"program time is  {time.time() - start_time} seconds")
 
