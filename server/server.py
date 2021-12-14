@@ -231,25 +231,25 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Config')
 
     parser.add_argument(
-        '--config', '--c',
+        '--config', '-c',
         type=str,
         default="config.ini",
         help='enter config (default: config.ini)'
     )
     parser.add_argument(
-        '--i',
+        '-i',
         type=str,
         help='enter target interface'
     )
     parser.add_argument(
-        '--out', '--o',
+        '--out', '-o',
         type=str,
-        default="output_file",
-        help='enter output file (default: output_file.txt)'
+        default="clients_list.out",
+        help='enter output file (default: clients_list.out)'
     )
 
     parser.add_argument(
-        '--type', '--t',
+        '--type', '-t',
         type=str,
         default="text",
         help="enter the output type, it may be: python program will return a dictionary;\n text - the program will output as a text file\n; config - the program will add ip addresses to the transmitted config file  (default: text)"
@@ -257,7 +257,7 @@ if __name__=='__main__':
 
 
     parser.add_argument(
-        '--config_sh', '--s',
+        '--config_sh', '-s',
         type=str,
         default="conf.sh",
         help="enter the config file to which you want to add ip addresses (default: conf.sh)"

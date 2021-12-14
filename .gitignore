@@ -3,3 +3,4 @@
 **/configuration
 **/log/
 **/*.log
+**/*.out
