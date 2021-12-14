@@ -197,14 +197,12 @@ if __name__=='__main__':
         default="config.ini",
         help='enter config (default: config.ini)'
     )
-    '''#закомментировано, тк интерфейс угадывается автоматически
+    #закомментировано, тк интерфейс угадывается автоматически
     parser.add_argument(
         '--i',
         type=str,
         help='enter target interface'
     )
-    args = parser.parse_args()
-    '''
     parser.add_argument(
         '--out', '--o',
         type=str,
