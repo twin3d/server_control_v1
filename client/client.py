@@ -88,7 +88,19 @@ def client_func(config_file, target_interface = None):
     
     message = "Hi, glad to see u"
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((ipv4, int(port)))
+
+    try:
+        sock.bind((ipv4, int(port)))
+    except:
+        request = (f"sudo kill $(sudo lsof -t -i:{port})")
+        code = os.system(request)
+        try:
+            sock.bind((ipv4, int(port)))
+        except:
+            print("Bind error - port is already occupied. Wait some time and restart")
+            sys.exit()
+
+        
     sock.listen(5)
     data=""
     while True:
