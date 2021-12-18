@@ -6,6 +6,7 @@ import os
 import argparse
 import sys
 import signal
+import time
 
 def guess_interface(): 
 
@@ -23,12 +24,10 @@ def guess_interface():
 
 
 def signal_handler(signum, frame):
-    global number
     print("Signal Exit")
+    sock.close()
     sys.exit(0)
-    number = 1
-    print("signal numer =", number)
-    print("Signal Exit2")
+
 
 
 def client_func(config_file, target_interface = None):
@@ -97,6 +96,7 @@ def client_func(config_file, target_interface = None):
 
     
     message = "Hi, glad to see u"
+    global sock 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
@@ -104,12 +104,10 @@ def client_func(config_file, target_interface = None):
         sock.bind((ipv4, int(port)))
     except:
         try:
-            request = (f"sudo kill -SIGINT $(sudo lsof -t -i:{port})")
+            request = f"kill -SIGINT $(lsof -t -i:{port})"
             code = os.system(request)
             logging.debug(f"code os.system(request) is {code}")
-            request = (f"sudo ufw deny {port}")
-            code = os.system(request)
-            logging.debug(f"code os.system(request) is {code}")
+            time.sleep(200)
             sock.bind((ipv4, int(port)))
         except:
             print("Bind error - port is already occupied. Wait some time and restart")

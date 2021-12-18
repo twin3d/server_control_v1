@@ -31,11 +31,11 @@ def connect(addr,search_port, socket_timeout):
      after that, it receives the client's data'''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #sock.settimeout(float(socket_timeout))
-    sock.settimeout(0.01)
+    sock.settimeout(socket_timeout)
     result = sock.connect_ex((str(addr),int(search_port)))
     if result == 0:
         logging.debug(f"Found client on {addr}")
-        logging.debug("connect done")
+        #logging.debug("connect done")
         data = sock.recv(1024)
         logging.debug(f"got message  {data.decode('utf8')}")
         sock.send('Hi, glad to see u'.encode('utf8'))
