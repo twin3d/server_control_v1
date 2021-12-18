@@ -5,7 +5,7 @@ import pickle
 import os
 import argparse
 import sys
-
+import signal
 
 def guess_interface(): 
 
@@ -20,6 +20,16 @@ def guess_interface():
             if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
                 return interface
     return "No interface"
+
+
+def signal_handler(signum, frame):
+    global number
+    print("Signal Exit")
+    sys.exit(0)
+    number = 1
+    print("signal numer =", number)
+    print("Signal Exit2")
+
 
 def client_func(config_file, target_interface = None):
     '''This function opens the port passed to it. 
@@ -89,12 +99,17 @@ def client_func(config_file, target_interface = None):
     message = "Hi, glad to see u"
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+
     try:
         sock.bind((ipv4, int(port)))
     except:
-        request = (f"sudo kill $(sudo lsof -t -i:{port})")
-        code = os.system(request)
         try:
+            request = (f"sudo kill -SIGINT $(sudo lsof -t -i:{port})")
+            code = os.system(request)
+            logging.debug(f"code os.system(request) is {code}")
+            request = (f"sudo ufw deny {port}")
+            code = os.system(request)
+            logging.debug(f"code os.system(request) is {code}")
             sock.bind((ipv4, int(port)))
         except:
             print("Bind error - port is already occupied. Wait some time and restart")
@@ -103,7 +118,12 @@ def client_func(config_file, target_interface = None):
         
     sock.listen(5)
     data=""
+    global number
+    number = 0
     while True:
+        signal.signal(signal.SIGINT, signal_handler)
+        if number == 1:
+            print("number = 1")
         conn, addr = sock.accept()
         logging.debug(f"connected from the address {addr}")
         conn.send("Hi, glad to see u".encode('utf8'))
@@ -116,7 +136,8 @@ def client_func(config_file, target_interface = None):
             conn.send(client_data_in_bytes)
         
         conn.close()
-        #break
+
+
 
 
 
@@ -131,12 +152,12 @@ if __name__=='__main__':
         default="config.ini",
         help='enter config (default: config.ini)'
     )
-    '''
+    
     parser.add_argument(
         '--i',
         type=str,
         help='enter target interface'
-    )'''
+    )
     args = parser.parse_args()
 
     #print(args.config, args.i)

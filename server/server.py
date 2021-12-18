@@ -35,8 +35,6 @@ def connect(addr,search_port, socket_timeout):
     result = sock.connect_ex((str(addr),int(search_port)))
     if result == 0:
         logging.debug(f"Found client on {addr}")
-        #global clients
-        #global clients_dict
         logging.debug("connect done")
         data = sock.recv(1024)
         logging.debug(f"got message  {data.decode('utf8')}")
