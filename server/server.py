@@ -13,15 +13,21 @@ message = "Hi, glad to see u"
 def guess_interface(): 
 
     interface_list=netifaces.interfaces()
+
     for interface in interface_list:
         if interface[0]=="e":
             #print(interface)
-            addrs = netifaces.ifaddresses(interface)
-            host=addrs[netifaces.AF_INET]
-            ipv4=host[0]['addr']
-            #print(ipv4)
-            if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
-                return interface
+            try:
+                addrs = netifaces.ifaddresses(interface)
+                print(f"{addrs}")
+                host=addrs[netifaces.AF_INET]
+                print(host)
+                ipv4=host[0]['addr']
+                #print(ipv4)
+                if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
+                    return interface
+            except:
+                pass
     return "No interface"
 
 def connect(addr, search_port, socket_timeout):
@@ -72,15 +78,19 @@ net_str = None):
         if not os.path.isfile(config_file):
             logging.error("No config file")
             return "NO_CONFIG_FILE"  
-        config.read(config_file)   
+        config.read(config_file)  
         search_port = config.get("GENERAL","Port")
-        socket_timeout = config["GENERAL"]["Timeout"]
+
+        socket_timeout = config.get("GENERAL","Timeout")
+
         if target_interface == None:
             target_interface = guess_interface()
+
         try:
             log_level = config.get("GENERAL","log_level")
         except Exception:
             log_level = "debug"
+
         
         
         logger = logging.getLogger()
@@ -93,7 +103,7 @@ net_str = None):
         logging.debug(f"search_port is {search_port}, socket_timeout is  {socket_timeout}")
     except Exception as err_msg:
         logging.error(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
-        print(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
+        #print(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
         sys.exit()
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
