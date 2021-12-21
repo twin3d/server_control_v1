@@ -8,6 +8,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 
 # Installing python packages
+echo -e "Checking python fieles"
 
 if [ "$(pip3 --version)" -ne 0 ]; then
     sudo apt update
@@ -23,6 +24,8 @@ mkdir -p "$client_target_dir/configuration"
 cp "$client_target_dir/config.ini" "$client_target_dir/configuration/configuration.ini"
 
 # Create unit file
+echo -e "Creating systemctl unit from 'scanner_watchdog.service_temp'"
+
 USER_SYSTEMD_DIR=/home/$USER/.config/systemd/user
 mkdir -p $USER_SYSTEMD_DIR
 
@@ -32,6 +35,8 @@ sed -i "s#%CLIENT_PATH#$client_target_dir#g" "scanner_watchdog.service_temp"
 sed -i "s#%USER#$USER#g" "scanner_watchdog.service_temp"
 
 cp "scanner_watchdog.service_temp" "$USER_SYSTEMD_DIR/scanner_watchdog.service"
+
+[[ $? -eq 0 ]] && { echo -e "Systemctl unit copied"; }
 
 rm "scanner_watchdog.service_temp"
 
