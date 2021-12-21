@@ -41,7 +41,7 @@ sudo cp "scanner_watchdog.service_temp" "$USER_SYSTEMD_DIR/scanner_watchdog.serv
 rm "scanner_watchdog.service_temp"
 
 #Systemctl activation
-sudo systemctl  daemon-reload && systemctl restart scanner_watchdog.service
+sudo systemctl  daemon-reload && sudo systemctl restart scanner_watchdog.service
 [[ $? -eq 0 ]] && { echo -e "Systemctl started"; }
 sudo systemctl  enable scanner_watchdog.service
 [[ $? -eq 0 ]] && { echo -e "Systemctl enabled"; }
