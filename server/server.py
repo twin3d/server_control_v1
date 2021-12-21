@@ -13,18 +13,24 @@ message = "Hi, glad to see u"
 def guess_interface(): 
 
     interface_list=netifaces.interfaces()
+
     for interface in interface_list:
         if interface[0]=="e":
             #print(interface)
-            addrs = netifaces.ifaddresses(interface)
-            host=addrs[netifaces.AF_INET]
-            ipv4=host[0]['addr']
-            #print(ipv4)
-            if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
-                return interface
+            try:
+                addrs = netifaces.ifaddresses(interface)
+                print(f"{addrs}")
+                host=addrs[netifaces.AF_INET]
+                print(host)
+                ipv4=host[0]['addr']
+                #print(ipv4)
+                if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
+                    return interface
+            except:
+                pass
     return "No interface"
 
-def connect(addr,search_port, socket_timeout):
+def connect(addr, search_port, socket_timeout):
     '''this function tries to connect to the transmitted port.
      If the port is open, it sends a message to the server and also receives a message. 
      If the messages match, it prints that everything is fine
@@ -32,6 +38,7 @@ def connect(addr,search_port, socket_timeout):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(float(socket_timeout))
     #sock.settimeout(socket_timeout)
+    #print(addr)
     result = sock.connect_ex((str(addr),int(search_port)))
     if result == 0:
         logging.debug(f"Found client on {addr}")
@@ -54,7 +61,8 @@ def connect(addr,search_port, socket_timeout):
 
 
 def get_client_ips( target_interface=None, search_port = "51815", mask = None, 
-config_file = "config.ini", output_file = None, output_type = None, conf = None):
+config_file = "config.ini", output_file = None, output_type = None, conf = None, 
+net_str = None):
     '''This function scans the network and looks for open ports in it. 
     Returns a list of ip addresses that have the corresponding port open  '''
 
@@ -70,15 +78,19 @@ config_file = "config.ini", output_file = None, output_type = None, conf = None)
         if not os.path.isfile(config_file):
             logging.error("No config file")
             return "NO_CONFIG_FILE"  
-        config.read(config_file)   
+        config.read(config_file)  
         search_port = config.get("GENERAL","Port")
-        socket_timeout = config["GENERAL"]["Timeout"]
+
+        socket_timeout = config.get("GENERAL","Timeout")
+
         if target_interface == None:
             target_interface = guess_interface()
+
         try:
             log_level = config.get("GENERAL","log_level")
         except Exception:
             log_level = "debug"
+
         
         
         logger = logging.getLogger()
@@ -91,7 +103,7 @@ config_file = "config.ini", output_file = None, output_type = None, conf = None)
         logging.debug(f"search_port is {search_port}, socket_timeout is  {socket_timeout}")
     except Exception as err_msg:
         logging.error(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
-        print(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
+        #print(f"!!! Error !!! when reading config file! Check {config_file} file, or get default one. More exact: {err_msg}.")
         sys.exit()
 
     interface_list=netifaces.interfaces() #получить список интерфейсов
@@ -112,8 +124,9 @@ config_file = "config.ini", output_file = None, output_type = None, conf = None)
     #mask='255.255.0.0' #checked what would happen with a smaller mask
     logging.debug(f"Iv4 is {ipv4}/{mask}")
     
-    s=ipv4+"/"+mask
-    net = ipaddress.IPv4Network(s, strict=False)
+    if net_str == None:
+        net_str=ipv4+"/"+mask
+    net = ipaddress.IPv4Network(net_str, strict=False)
 
     logging.debug(f"my net is {net}")
     logging.debug(f"search_port is {search_port}")  
@@ -261,6 +274,12 @@ if __name__=='__main__':
         help="enter the config file to which you want to add ip addresses (default: conf.sh)"
     )
 
+    parser.add_argument(
+        '--net', '-n',
+        type=str,
+        help="enter net which you wanna scan"
+    )
+
     args = parser.parse_args()
     output_types=["python", "text", "config"]
     if args.type not in output_types:
@@ -268,7 +287,7 @@ if __name__=='__main__':
         sys.exit()
 
     get_client_ips(config_file = args.config, output_file = args.out,
-    output_type =args.type, conf = args.config_sh)
+    output_type =args.type, conf = args.config_sh, net_str = args.net)
     logging.info(clients_dict)
     #logging.debug(f"program time is  {time.time() - start_time} seconds")
 
