@@ -1,7 +1,8 @@
 [Unit]
 Description=Scanner clien
+#After=network.target
+Wants=network.target
 After=network.target
-
 
 [Service]
 Type=simple
@@ -9,7 +10,7 @@ Type=simple
 #User=%USER
 WorkingDirectory=%CLIENT_PATH
 ExecStart=python3 %CLIENT_PATH/client.py --config %CLIENT_PATH/configuration/configuration.ini
-Restart=on-failure
+Restart=always
 # Other restart options: always, on-abort, etc
 #StandardInput=tty-force
 
