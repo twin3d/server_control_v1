@@ -38,6 +38,6 @@ rm "scanner_watchdog.service_temp"
 #Systemctl activation
 systemctl --user daemon-reload && systemctl --user restart scanner_watchdog.service
 systemctl --user restart scanner_watchdog.service
-[[ $? -gt 0 ]] && { echo -e "Systemctl started"; }
+[[ $? -eq 0 ]] && { echo -e "Systemctl started"; }
 systemctl --user enable scanner_watchdog.service
-[[ $? -gt 0 ]] && { echo -e "Systemctl enabled"; }
+[[ $? -eq 0 ]] && { echo -e "Systemctl enabled"; }
