@@ -120,6 +120,7 @@ def client_func(config_file, target_interface = None):
     number = 0
     while True:
         signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
         if number == 1:
             print("number = 1")
         conn, addr = sock.accept()

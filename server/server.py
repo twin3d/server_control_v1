@@ -15,13 +15,11 @@ def guess_interface():
     interface_list=netifaces.interfaces()
 
     for interface in interface_list:
-        if interface[0]=="e":
+        if interface[0]=="e" or interface[0]=="w":
             #print(interface)
             try:
                 addrs = netifaces.ifaddresses(interface)
-                print(f"{addrs}")
                 host=addrs[netifaces.AF_INET]
-                print(host)
                 ipv4=host[0]['addr']
                 #print(ipv4)
                 if ipv4[:6]=="192.16" or ipv4[:3]=="10." or ipv4[:6]=="172.16":
@@ -39,21 +37,22 @@ def connect(addr, search_port, socket_timeout):
     sock.settimeout(float(socket_timeout))
     #sock.settimeout(socket_timeout)
     #print(addr)
+    #sock.settimeout()
     result = sock.connect_ex((str(addr),int(search_port)))
     if result == 0:
         logging.debug(f"Found client on {addr}")
         #logging.debug("connect done")
         data = sock.recv(1024)
-        logging.debug(f"got message  {data.decode('utf8')}")
+        #logging.debug(f"got message  {data.decode('utf8')}")
         sock.send('Hi, glad to see u'.encode('utf8'))
         if str(data.decode('utf8')) == message:
             clients.append(addr)
-            logging.debug("keys are equal")
+            #logging.debug("keys are equal")
             #getting client data
             client_data_in_bytes = sock.recv(2048)
             client_data = pickle.loads(client_data_in_bytes)
-            logging.debug("got client data")
-            logging.debug(str(client_data))
+            #logging.debug("got client data")
+            #logging.debug(str(client_data))
             clients_dict[str(addr)] = client_data
             
     sock.close()
@@ -116,7 +115,7 @@ net_str = None):
     addrs = netifaces.ifaddresses(target_interface)
 
     host=addrs[netifaces.AF_INET]
-    logging.debug(f"Host is {host}")
+    #logging.debug(f"Host is {host}")
 
     ipv4=host[0]['addr']
     if mask == None:
