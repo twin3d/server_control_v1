@@ -11,9 +11,8 @@ import argparse
 message = "Hi, glad to see u"
 
 def guess_interface(): 
-
+    '''this function guesses the interface'''
     interface_list=netifaces.interfaces()
-
     for interface in interface_list:
         if interface[0]=="e" or interface[0]=="w":
             #print(interface)
@@ -145,7 +144,7 @@ net_str = None):
 
 
 def output(output_file, output_type, conf):
-    '''output function'''
+    '''this function is based on output_type сalls a function of the form in the appropriate form'''
     if output_type == "python":
         logging.debug('Python output')
         return clients_dict
@@ -163,7 +162,7 @@ def output(output_file, output_type, conf):
 
 
 def print_to_file(filename):
-    '''function of output of the program result to a file'''
+    '''function of output of the program result to a text file'''
     try:
         file = open(filename, "w")
     except Exception as err_msg:
@@ -200,8 +199,16 @@ def print_to_file(filename):
 
 
 def correct_file(input_filename, output_filename):
+    '''this function replaces the ip addresses in 3d_automation/server_control/config.sh 
+    and outputs to output_filename'''
+    logging.debug("Correcting file")
     input_file = open(input_filename, "r")
     output_file = open(output_filename,"w")
+
+    if os.path.isfile("../../3d_automation/server_control/config.sh"):
+        os.system(f"cp ../../3d_automation/server_control/config.sh {input_filename}")
+        logging.debug("copy config from 3d_automation")
+    
 
     big_cliets_list=[]
     small_cliets_list=[]
@@ -218,15 +225,28 @@ def correct_file(input_filename, output_filename):
         if not line:
             break
         output_file.write(line)
-        if "BIG" in line:
+        if '$SCANNER == "BIG"' in line:
             for ip in big_cliets_list:
                 output_file.write(f'  ips+=("{ip}")\n')
                 output_file.write('  users+=("pi")')
+            while True:
+                line = input_file.readline()
+                if not line:
+                    break
+                if "SCANNER_MQTT_IP" in line:
+                    break
 
-        if "SMALL" in line:
+
+        if '$SCANNER == "SMALL"' in line:
             for ip in small_cliets_list:
                 output_file.write(f'  ips+=("{ip}")\n')
                 output_file.write('  users+=("pi")')
+            while True:
+                line = input_file.readline()
+                if not line:
+                    break
+                if "SCANNER_MQTT_IP" in line:
+                    break
 
 
 

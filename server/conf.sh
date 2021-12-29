@@ -24,13 +24,50 @@ fi
 
 
 if [[ $SCANNER == "SMALL" ]]; then
-  
+  #ips+=("192.160.21.8") #8 
+  #users+=("dev1")
+  #ips+=("192.160.21.36") # raspberrypitemp
+  #users+=("pi") #pass = twin787898	
+  ips+=("192.160.21.30") # raspberrypi2
+  users+=("pi") #pass = twin787898
+  ips+=("192.160.21.35") # raspberrypi7 dc:a6:32:79:53:be
+  users+=("pi") #pass = twin787898
+  ips+=("192.160.21.110") # raspberrypiS4 dc:a6:32:b9:e3:c1
+  users+=("pi") #pass = twin787898
+  ips+=("192.160.21.11") #raspberrypi11
+  users+=("pi") #pass = twin787898
+  ips+=("192.160.21.113") #raspberrypi11
+  users+=("pi") #pass = twin787898
   SCANNER_MQTT_IP="192.160.21.19"
   PLUG_IP="192.160.21.140"
   PLUG_TOKEN="56a298c71d5d4ac8a13f6244971dd031"
 
 elif [[ $SCANNER == "BIG" ]]; then
-  
+  ips+=("192.160.21.46") #raspberrypi5
+  users+=("pi")
+  good_cameras+=(21)
+  #ips+=("192.160.21.36") #raspberrypi4
+  #users+=("pi")
+  ips+=("192.160.21.24") #raspberrypi6 #  	8a:c9:c2:38:38:b7
+  users+=("pi")
+  ips+=("192.160.21.3") #raspberrypi8 # 	0e:e3:e3:5a:0b:92
+  users+=("pi")
+  good_cameras+=(21)
+  ips+=("192.160.21.18") #raspberrypi9
+  users+=("pi")
+  good_cameras+=(20)
+  ips+=("192.160.21.64") #raspberrypi3
+  users+=("pi")
+  ips+=("192.160.21.60") #rasp1281    dc:a6:32:b9:e2:ec
+  users+=("pi")
+  ips+=("192.160.21.13") #raspberrypi12
+  users+=("pi")
+  #ips+=("192.160.21.22") #dev1_22
+  #users+=("dev1")
+  good_cameras+=(7)
+  #ips+=("192.160.21.2") #dev1_22
+  #users+=("dev1")
+  good_cameras+=(7)
   SCANNER_MQTT_IP="192.160.21.48"
   PLUG_IP="192.160.21.125"
   PLUG_TOKEN="5608394216efaf02f2f04032de74052a"

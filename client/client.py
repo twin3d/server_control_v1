@@ -9,7 +9,7 @@ import signal
 import time
 
 def guess_interface(): 
-
+    '''this function guesses the interface'''
     interface_list=netifaces.interfaces()
     for interface in interface_list:
         if interface[0]=="e":
@@ -24,6 +24,7 @@ def guess_interface():
 
 
 def signal_handler(signum, frame):
+    '''this signal handler closes the socket when the program terminates on a signal'''
     print("Signal Exit")
     sock.close()
     sys.exit(0)
@@ -43,8 +44,16 @@ def client_func(config_file, target_interface = None):
         if not os.path.isfile(config_file):
             logging.error("No config file")
             return "NO_CONFIG_FILE"
-        config.read(config_file)   
-        scaner_name = config.get("GENERAL","Scanername")
+        config.read(config_file)
+        default_name_sourse = config.get("GENERAL","default_name_sourse") 
+        if default_name_sourse == "host":
+            scaner_name = socket.gethostname()
+        elif default_name_sourse == "scannername": 
+            scaner_name = config.get("GENERAL","Scannername")
+        else:
+            print("parsed incorrect default_name_sourse")
+            sys.exit()
+        print(scaner_name)
         scaner_type = config.get("GENERAL","Type")
         if target_interface == None:
             target_interface = guess_interface()
@@ -104,9 +113,6 @@ def client_func(config_file, target_interface = None):
         sock.bind((ipv4, int(port)))
     except:
         try:
-            request = f"kill -SIGINT $(lsof -t -i:{port})"
-            code = os.system(request)
-            logging.debug(f"code os.system(request) is {code}")
             time.sleep(200)
             sock.bind((ipv4, int(port)))
         except:
@@ -116,20 +122,15 @@ def client_func(config_file, target_interface = None):
         
     sock.listen(5)
     data=""
-    global number
-    number = 0
     while True:
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
-        if number == 1:
-            print("number = 1")
         conn, addr = sock.accept()
-        logging.debug(f"connected from the address {addr}")
+        logging.debug(f'connected from the address {addr} on {time.strftime("%H:%M:%S", time.localtime())}')
+
         conn.send("Hi, glad to see u".encode('utf8'))
         data = conn.recv(1024)
-        logging.debug(data.decode("utf8"))
         if (data.decode('utf8')) == message:
-            logging.debug("keys are equal")
             #sending client data
             client_data_in_bytes=pickle.dumps(client_data)
             conn.send(client_data_in_bytes)
